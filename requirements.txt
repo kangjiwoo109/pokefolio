@@ -1,5 +1,6 @@
 streamlit>=1.42
 Authlib>=1.3.2
+httpx>=0.28
 requests>=2.31
 pandas>=2.0
 altair>=5.0
