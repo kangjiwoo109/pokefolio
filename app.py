@@ -8,6 +8,7 @@ import datetime as dt
 import html
 import json
 import os
+import traceback
 import uuid
 from pathlib import Path
 
@@ -147,6 +148,13 @@ def won(x, sign=False):
     return f"₩{x:,.0f}"
 
 
+def why(e: Exception) -> str:
+    """오류 원인을 짧게 (비밀값은 들어가지 않음) + 서버 로그에 자세히"""
+    traceback.print_exc()
+    msg = str(e).replace(SB_KEY or "\x00", "***") if "SB_KEY" in globals() else str(e)
+    return f"{type(e).__name__}: {msg[:180]}"
+
+
 def secret(*path, default=None):
     try:
         v = st.secrets
@@ -200,8 +208,8 @@ def login_screen():
                     user = store.sign_in(uid_in, pw)
             except storage.AuthError as e:
                 st.error(str(e))
-            except Exception:
-                st.error("서버에 연결하지 못했어요. 잠시 뒤에 다시 해 주세요.")
+            except Exception as e:
+                st.error(f"서버에 연결하지 못했어요. 이 내용을 알려 주세요 → {why(e)}")
             else:
                 for k in ("pf", "results", "picked", "trash", "refresh_log", "api"):
                     st.session_state.pop(k, None)
@@ -229,8 +237,8 @@ if GOOGLE and not st.session_state.get("user") and st.user.is_logged_in:
         st.error(str(e))
         st.button("다시 로그인", on_click=st.logout)
         st.stop()
-    except Exception:
-        st.error("서버에 연결하지 못했어요. 잠시 뒤에 새로 고침해 주세요.")
+    except Exception as e:
+        st.error(f"서버에 연결하지 못했어요. 이 내용을 알려 주세요 → {why(e)}")
         st.stop()
 
 if CLOUD and not st.session_state.get("user"):
@@ -246,8 +254,8 @@ if "pf" not in st.session_state:
     except json.JSONDecodeError:
         st.error("portfolio.json 파일이 손상돼서 읽지 못했어요. 백업 파일로 복원해 주세요.")
         st.session_state.pf = {"cards": [], "history": []}
-    except Exception:
-        st.error("내 카드를 불러오지 못했어요. 잠시 뒤에 새로 고침해 주세요.")
+    except Exception as e:
+        st.error(f"내 카드를 불러오지 못했어요. 이 내용을 알려 주세요 → {why(e)}")
         st.stop()
 pf = st.session_state.pf
 pf.setdefault("cards", [])
@@ -258,8 +266,8 @@ settings = {} if CLOUD else core.load_json(SETTINGS_FILE, {})
 def persist():
     try:
         store.save_portfolio(uid, pf)
-    except Exception:
-        st.error("저장하지 못했어요. 인터넷 연결을 확인하고 다시 해 주세요.")
+    except Exception as e:
+        st.error(f"저장하지 못했어요. 이 내용을 알려 주세요 → {why(e)}")
 
 
 # ---------------------------------------------------------------- 사이드바: API 키

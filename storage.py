@@ -176,7 +176,7 @@ class SupabaseStore:
         if r.status_code in (400, 409, 422) and ("already" in r.text.lower() or "exists" in r.text.lower()):
             raise AuthError("이미 쓰고 있는 아이디예요. 다른 아이디를 골라 주세요.")
         if r.status_code >= 400:
-            raise AuthError(f"가입하지 못했어요. 잠시 뒤에 다시 해 주세요. ({r.status_code})")
+            raise AuthError(f"가입하지 못했어요. ({r.status_code}: {r.text[:150]})")
         return self.sign_in(uid, password)
 
     def sign_in(self, user_id: str, password: str) -> dict:
@@ -185,9 +185,15 @@ class SupabaseStore:
         if r.status_code in (400, 401):
             raise AuthError("아이디나 비밀번호가 맞지 않아요.")
         if r.status_code >= 400:
-            raise AuthError(f"로그인하지 못했어요. 잠시 뒤에 다시 해 주세요. ({r.status_code})")
-        j = r.json()
-        return {"id": j["user"]["id"], "login_id": user_id.strip().lower()}
+            raise AuthError(f"로그인하지 못했어요. ({r.status_code}: {r.text[:150]})")
+        try:
+            j = r.json()
+            uid = (j.get("user") or {}).get("id") or j.get("id")
+        except ValueError:
+            uid = None
+        if not uid:
+            raise AuthError(f"로그인 응답을 읽지 못했어요. ({r.status_code}: {r.text[:120]})")
+        return {"id": uid, "login_id": user_id.strip().lower()}
 
     def change_password(self, user: dict, old: str, new: str) -> None:
         self.sign_in(user["login_id"], old)  # 지금 비밀번호 확인
