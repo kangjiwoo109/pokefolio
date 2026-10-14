@@ -1,0 +1,12 @@
+# 개인 데이터와 비밀값은 GitHub에 올리지 않기
+settings.json
+portfolio.json
+api_log.json
+shared_cache.json
+sets_cache.json
+set_cards_cache.json
+pokemon_ko_names.json
+.streamlit/secrets.toml
+__pycache__/
+*.bat
+*.vbs
