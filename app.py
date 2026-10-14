@@ -41,6 +41,7 @@ page = st.session_state.setdefault("page", "home")
 
 st.markdown("""
 <style>
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap");
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 :root {
   --pf-up: #ff6b6b;      /* 상승: 빨강 (국내 관례) */
@@ -128,11 +129,17 @@ html, body, [class*="st-"], .stMarkdown, input, textarea, button {
 [data-testid="stSidebar"] .stButton button { justify-content:flex-start; border-radius:10px; }
 .pf-invest { margin-bottom:1.1rem; }
 .pf-legend-title { color:var(--pf-muted); font-size:.8rem; margin:0 0 .3rem .2rem; }
-.pf-login-head { text-align:center; margin:3rem 0 1.5rem; }
-.pf-login-head .pf-meta { margin-top:.4rem; }
 .pf-me { font-weight:700; font-size:1.05rem; margin-bottom:.2rem; }
 .pf-or { display:flex; align-items:center; gap:.7rem; color:var(--pf-muted); font-size:.8rem; margin:1rem 0 .6rem; }
 .pf-or::before, .pf-or::after { content:""; flex:1; height:1px; background:var(--pf-line); }
+.pf-login-head { text-align:center; margin:2.6rem 0 1.6rem; display:flex; flex-direction:column; align-items:center; }
+.pf-logo { filter: drop-shadow(0 10px 24px rgba(240,138,36,.25)); margin-bottom:.3rem; }
+.pf-wordmark { font-family:"Fredoka", "Pretendard Variable", sans-serif !important; font-weight:700; font-size:3rem;
+  letter-spacing:-.01em; line-height:1; }
+.pf-wordmark span { font-family:inherit !important; }
+.pf-wordmark .pk { color:#f4f2ee; }
+.pf-wordmark .fo { background:linear-gradient(135deg,#ffd166,#f08a24); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.pf-tagline { color:var(--pf-muted); font-size:.95rem; margin-top:.7rem; }
 @media (prefers-reduced-motion: reduce) { .pf-tile { transition:none; } .pf-tile:hover { transform:none; } }
 </style>
 """, unsafe_allow_html=True)
@@ -178,11 +185,35 @@ else:
 price_cache = storage.PriceCache(store)
 
 
+LOGO_SVG = """<svg class="pf-logo" viewBox="0 0 96 96" width="88" height="88" role="img" aria-label="pokefolio 로고">
+  <defs>
+    <linearGradient id="pfFront" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd166"/><stop offset="1" stop-color="#f08a24"/>
+    </linearGradient>
+    <linearGradient id="pfBack" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a4150"/><stop offset="1" stop-color="#262b36"/>
+    </linearGradient>
+  </defs>
+  <g transform="rotate(-12 48 50)">
+    <rect x="22" y="14" width="44" height="62" rx="8" fill="url(#pfBack)" stroke="#4b5363" stroke-width="1.5"/>
+  </g>
+  <g transform="rotate(9 48 50)">
+    <rect x="30" y="20" width="44" height="62" rx="8" fill="url(#pfFront)"/>
+    <rect x="35" y="25" width="34" height="26" rx="4" fill="#ffffff" fill-opacity=".28"/>
+    <rect x="35" y="56" width="22" height="4" rx="2" fill="#ffffff" fill-opacity=".55"/>
+    <rect x="35" y="64" width="15" height="4" rx="2" fill="#ffffff" fill-opacity=".38"/>
+  </g>
+  <path d="M74 12 L77 21 L86 24 L77 27 L74 36 L71 27 L62 24 L71 21 Z" fill="#fff4cc"/>
+  <path d="M18 70 L19.6 74.4 L24 76 L19.6 77.6 L18 82 L16.4 77.6 L12 76 L16.4 74.4 Z" fill="#f2b33d"/>
+</svg>"""
+
+
 def login_screen():
-    st.markdown("""
+    st.markdown(f"""
 <div class="pf-login-head">
-  <div class="pf-title">포켓몬 카드 포트폴리오</div>
-  <div class="pf-meta">내 카드의 시세와 손익을 한눈에. 아이디로 가입하면 카드가 내 계정에만 저장돼요.</div>
+  {LOGO_SVG}
+  <div class="pf-wordmark" aria-label="pokefolio"><span class="pk">poke</span><span class="fo">folio</span></div>
+  <div class="pf-tagline">내 카드의 시세와 손익을 한눈에</div>
 </div>""", unsafe_allow_html=True)
     _, mid, _ = st.columns([1, 1.4, 1])
     with mid:
