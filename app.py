@@ -28,7 +28,7 @@ APP_DIR = Path(__file__).resolve().parent
 SETTINGS_FILE = APP_DIR / "settings.json"
 UP, DOWN = "#e34948", "#2a78d6"  # 국내 관례: 상승 빨강, 하락 파랑
 
-st.set_page_config(page_title="포켓몬 카드 포트폴리오", page_icon="🃏", layout="wide",
+st.set_page_config(page_title="pokefolio", page_icon="🃏", layout="wide",
                    initial_sidebar_state="collapsed")
 
 PAGES = {  # 왼쪽 위 화살표로 여는 메뉴
@@ -140,6 +140,12 @@ html, body, [class*="st-"], .stMarkdown, input, textarea, button {
 .pf-wordmark .pk { color:#f4f2ee; }
 .pf-wordmark .fo { background:linear-gradient(135deg,#ffd166,#f08a24); -webkit-background-clip:text; background-clip:text; color:transparent; }
 .pf-tagline { color:var(--pf-muted); font-size:.95rem; margin-top:.7rem; }
+.pf-brand { display:flex; align-items:center; gap:.45rem; min-width:0; }
+.pf-logo-sm { flex:none; filter: drop-shadow(0 4px 10px rgba(240,138,36,.25)); }
+.pf-wordmark.sm { font-size:1.75rem; }
+.pf-page { color:var(--pf-muted); font-size:1rem; font-weight:600; margin-left:.4rem; padding-left:.7rem;
+  border-left:1px solid var(--pf-line); white-space:nowrap; }
+.pf-head { align-items:center; }
 @media (prefers-reduced-motion: reduce) { .pf-tile { transition:none; } .pf-tile:hover { transform:none; } }
 </style>
 """, unsafe_allow_html=True)
@@ -412,10 +418,12 @@ pct_txt = f"{t['pl_pct']:+.1f}%" if t["pl_pct"] is not None else "–"
 meta = [f"카드 {t['count']}장", f"1달러 ₩{fx:,.0f}"]
 if last_update:
     meta.append(f"시세 {last_update}")
-page_title = "포켓몬 카드 포트폴리오" if page == "home" else PAGES[page][0]
+small_logo = LOGO_SVG.replace('class="pf-logo"', 'class="pf-logo-sm"').replace('width="88" height="88"', 'width="40" height="40"')
+sub = "" if page == "home" else f'<span class="pf-page">{html.escape(PAGES[page][0])}</span>'
+
 st.markdown(f"""
 <div class="pf-head">
-  <div class="pf-title">{html.escape(page_title)}</div>
+  <div class="pf-brand">{small_logo}<span class="pf-wordmark sm"><span class="pk">poke</span><span class="fo">folio</span></span>{sub}</div>
   <div class="pf-meta">{' · '.join(html.escape(m) for m in meta)}</div>
 </div>
 """, unsafe_allow_html=True)
